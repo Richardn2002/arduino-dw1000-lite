@@ -42,7 +42,7 @@ This library initializes all modules to run under the configuration of 6.8Mbps, 
 
 More advanced functions like double buffering, frame filtering, power management... are also not implemented.
 
-As I said, this library is for high-school-ish projects. If you are working on an industrial project please read the DWM1000 user manual and write your own library.
+As I said, this library is for high-school-ish projects. If you are working on an industrial project please read the DW1000 user manual and write your own library.
 
 References
 ---
@@ -55,6 +55,7 @@ License
 This project is under MIT
 
 Copyright 2021 Richardn
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
