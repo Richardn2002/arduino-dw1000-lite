@@ -9,6 +9,7 @@ Who would need this library?
 If you just happened to come across UWB technology moments ago on the Internet and want to get hands on it/
 
 If you are working on a high school project that requires the use of UWB (most likely for ranging),
+
 then you have came to the right place.
 
 Usage
@@ -23,7 +24,7 @@ Module Initialization (to the default configuration)
 
 Module Hardware Reset
 
-Read/Write all registers
+Read/Write Registers
 
 Delayed/Immediate Message Transmission/Reception
 
@@ -45,9 +46,9 @@ As I said, this library is for high-school-ish projects. If you are working on a
 
 References
 ---
-During writing, [arduino-dw1000-ng](https://github.com/F-Army/arduino-dw1000-ng) was heavily referenced (but this repo is nothing of a fork of it). Thanks to [F-Army](https://github.com/F-Army) and [thorto](https://github.com/thotro).
+During writing, [arduino-dw1000-ng](https://github.com/F-Army/arduino-dw1000-ng) was heavily referenced (but this repo is nothing of a fork of it). Thanks to [F-Army](https://github.com/F-Army) and [thotro](https://github.com/thotro).
 
-And of course, [DWM1000 User Manual](https://www.decawave.com/wp-content/uploads/2019/07/DW1000-User-Manual-1.pdf). As long as you have a month before your project deadline you shall read it :D.
+And of course, [DW1000 User Manual](https://www.decawave.com/wp-content/uploads/2019/07/DW1000-User-Manual-1.pdf). As long as you have a month before your project deadline you shall read it :D.
 
 License
 ---
