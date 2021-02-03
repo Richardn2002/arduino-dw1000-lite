@@ -10,7 +10,7 @@ If you just happened to come across UWB technology moments ago on the Internet a
 
 If you are working on a high school project that requires the use of UWB (most likely for ranging),
 
-then you have came to the right place.
+then you have come to the right place.
 
 Usage
 ---
