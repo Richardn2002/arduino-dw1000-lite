@@ -1,0 +1,10 @@
+Usage:
+Get two Arduino boards and two DWM1000 modules, one for each board. Connect power lines, MOSI, MISO, CLK. Connect SS/CSN/Chip Select to D4 and RST to D7.
+Download the folders, open the two .ino files with Arduino IDE and upload them respectively to the remote Arduino and the local Arduino。
+Now you will be getting the distance (mm) between the two tags from the local board through the serial. Note that the readings only make sense under line-of-sight conditions and they have a fixed difference to the real values. Calibration is needed and easy.
+
+Notes:
+This example is messy and uses several ugly tricks to get the measurement merely going. This is because all the codes here are derived from my university project, main logic untouched, which I managed to get our team's prototype going just before the deadline (and at that time I even used a 'hybrid library' consisting of my codes and F-Army's codes). Ugliness is expected. I put them here both as an example for this library and in memory of my university project.
+That DW1000.cpp is a work of my actual coding skills. This example does not utilize its whole capabilities at all. You are encouraged to look into it and learn to use all its functions. I think it is pretty good self-documented.
+The motivation to start developing this library was that any DW1000 lib forked from thotro does not support multiple modules on one device natively. With my library you just specify to which module a command shall be sent by chip select pin numbers and then you can control as many modules as you like, as long as there are space left on your Arduino.
+When uploading this library to github I do not have my electronics at hand, thus the example codes presented here are not tested. If I accidentally broke the logic during the cleaning process, the proper readings may not come out. I hope this will not happen, and will test the codes as soon as I get back to the lab.
