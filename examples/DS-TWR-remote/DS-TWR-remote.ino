@@ -5,7 +5,7 @@ const int A_RST = 7;
 unsigned long disconnectTimer;
 
 void setup() {
-    Serial.begin(9600);
+    SPI.begin();
 
     Init(A_CSN, A_RST);
     disconnectTimer = millis();
@@ -18,15 +18,7 @@ uint64_t DelayedTx() {
     ForceTRxOff(A_CSN);
     ClearTransmitStatus(A_CSN);
 
-    byte buf[5];
-    GetReceiveTimestamp(A_CSN, buf);
-    uint64_t sendTime = buf[0]; sendTime <<= 8;
-    sendTime += buf[1]; sendTime <<= 8;
-    sendTime += buf[2]; sendTime <<= 8;
-    sendTime += buf[3]; sendTime <<= 8;
-    sendTime += buf[4];
-    uint64_t receiveTime = sendTime;
-    sendTime >>= 25;
+    uint64_t sendTime = getTimestamp(A_CSN) >> 25;
     sendTime += 2;
     sendTime <<= 25;
     SetDelayedTime(A_CSN, sendTime);
@@ -34,6 +26,7 @@ uint64_t DelayedTx() {
     byte msg[10];
     uint64_t replyTime;
     uint64_t roundTime;
+    uint64_t receiveTime = getReceiveTimestamp(A_CSN);
     replyTime = sendTime - receiveTime;
     roundTime = receiveTime - previousTx;
     msg[0] = 0xFF&(replyTime>>32);
@@ -46,7 +39,6 @@ uint64_t DelayedTx() {
     msg[7] = 0xFF&(roundTime>>16);
     msg[8] = 0xFF&(roundTime>>8);
     msg[9] = 0xFF&roundTime;
-
     SetTransmitData(A_CSN, 10, msg);
     StartTransmit(A_CSN, true, false);
     unsigned long startTime = micros();
@@ -57,6 +49,7 @@ uint64_t DelayedTx() {
             break;
         }
     }
+
     return sendTime;
 }
 
@@ -72,6 +65,7 @@ void loop() {
             break;
         }
     }
+    
     previousTx = DelayedTx();
     if (timeout) {
         if (millis() - disconnectTimer > 100) {

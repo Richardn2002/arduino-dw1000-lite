@@ -2,11 +2,13 @@
 const int A_CSN = 4;
 const int A_RST = 7;
 
-double OFFSET = 100;
+double OFFSET = 153900;
 unsigned long updateTime;
 unsigned long disconnectTimer;
 
 void setup() {
+    Serial.begin(9600);
+    SPI.begin();
     Init(A_CSN, A_RST);
 
     updateTime = millis();
@@ -20,13 +22,7 @@ uint64_t DelayedTx(int CSN) {
     ClearTransmitStatus(CSN);
 
     byte buf[5];
-    GetReceiveTimestamp(CSN, buf);
-    uint64_t sendTime = buf[0]; sendTime <<= 8;
-    sendTime += buf[1]; sendTime <<= 8;
-    sendTime += buf[2]; sendTime <<= 8;
-    sendTime += buf[3]; sendTime <<= 8;
-    sendTime += buf[4];
-    sendTime >>= 25;
+    uint64_t sendTime = getTimestamp(CSN) >> 25;
     sendTime += 2;
     sendTime <<= 25;
     SetDelayedTime(CSN, sendTime);
@@ -41,6 +37,7 @@ uint64_t DelayedTx(int CSN) {
             break;
         }
     }
+
     return sendTime;
 }
 
@@ -56,16 +53,7 @@ uint64_t WaitForResponse(int CSN) {
         }
     }
 
-    byte buf[5];
-    GetReceiveTimestamp(CSN, buf);
-    uint64_t timestamp = buf[0]; timestamp <<= 8;
-    timestamp += buf[1]; timestamp <<= 8;
-    timestamp += buf[2]; timestamp <<= 8;
-    timestamp += buf[3]; timestamp <<= 8;
-    timestamp += buf[4];
-
-    delayMicroseconds(100);
-    return timestamp;
+    return getReceiveTimestamp(CSN);
 }
 
 uint64_t GetReplyTime(int CSN) {
@@ -73,11 +61,12 @@ uint64_t GetReplyTime(int CSN) {
     uint64_t replyTime;
 
     GetReceiveData(CSN, 10, data);
-    replyTime |= data[0]; replyTime <<= 8;
-    replyTime |= data[1]; replyTime <<= 8;
-    replyTime |= data[2]; replyTime <<= 8;
-    replyTime |= data[3]; replyTime <<= 8;
-    replyTime |= data[4];
+    replyTime = data[0]; replyTime <<= 8;
+    replyTime += data[1]; replyTime <<= 8;
+    replyTime += data[2]; replyTime <<= 8;
+    replyTime += data[3]; replyTime <<= 8;
+    replyTime += data[4];
+
     return replyTime;
 }
 
@@ -86,11 +75,12 @@ uint64_t GetRoundTime(int CSN) {
     uint64_t roundTime;
 
     GetReceiveData(CSN, 10, data);
-    roundTime |= data[5]; roundTime <<= 8;
-    roundTime |= data[6]; roundTime <<= 8;
-    roundTime |= data[7]; roundTime <<= 8;
-    roundTime |= data[8]; roundTime <<= 8;
-    roundTime |= data[9];
+    roundTime = data[5]; roundTime <<= 8;
+    roundTime += data[6]; roundTime <<= 8;
+    roundTime += data[7]; roundTime <<= 8;
+    roundTime += data[8]; roundTime <<= 8;
+    roundTime += data[9];
+
     return roundTime;
 }
 
@@ -117,12 +107,8 @@ double GetDistance(int CSN) {
     round2 = GetRoundTime(CSN);
     propTime = (round1 * round2 - reply1 * reply2) / (round1 + round2 + reply1 + reply2);
 
-    double prop = (double)(0x00000000FFFFFFFF & propTime);
-    if (prop > 10000) {
-        return 0;
-    } else {
-        return prop * 4.6917639786 - OFFSET;
-    }
+    double prop = (double)propTime;
+    return prop * 4.6917639786 - OFFSET;
 }
 
 bool disconnected = false;

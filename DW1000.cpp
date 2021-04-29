@@ -234,11 +234,11 @@ bool isReceiveTimestampAvailable(int CSN) {
 uint64_t getTimestamp(int CSN) {
     byte buf[5];
     ReadReg(CSN, SYS_TIME, 0, 5, buf);
-    uint64_t timestamp = buf[0]; timestamp <<= 8;
-    timestamp += buf[1]; timestamp <<= 8;
-    timestamp += buf[2]; timestamp <<= 8;
+    uint64_t timestamp = buf[4]; timestamp <<= 8;
     timestamp += buf[3]; timestamp <<= 8;
-    timestamp += buf[4];
+    timestamp += buf[2]; timestamp <<= 8;
+    timestamp += buf[1]; timestamp <<= 8;
+    timestamp += buf[0];
     return timestamp;
 }
 
@@ -257,11 +257,11 @@ bool isReceiveError(int CSN) { //Note: Rejection due to frame filtering or timeo
 uint64_t getReceiveTimestamp(int CSN){
     byte buf[5];
     ReadReg(CSN, RX_TIME, 0, 5, buf);
-    uint64_t timestamp = buf[0]; timestamp <<= 8;
-    timestamp += buf[1]; timestamp <<= 8;
-    timestamp += buf[2]; timestamp <<= 8;
+    uint64_t timestamp = buf[4]; timestamp <<= 8;
     timestamp += buf[3]; timestamp <<= 8;
-    timestamp += buf[4];
+    timestamp += buf[2]; timestamp <<= 8;
+    timestamp += buf[1]; timestamp <<= 8;
+    timestamp += buf[0];
     return timestamp;
 }
 
