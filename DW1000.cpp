@@ -5,7 +5,7 @@ const SPISettings SPI_FAST = SPISettings(16000000, MSBFIRST, SPI_MODE0);
 const SPISettings SPI_SLOW = SPISettings(2000000, MSBFIRST, SPI_MODE0);
 SPISettings _SPISettings;
 
-void _SPITxn(int CSN, int headerLen, byte* header, int dataLen, byte data[], int respLen, byte resp[]) {
+void _SPITxn(int CSN, int headerLen, byte* header, int dataLen, byte* data, int respLen, byte resp[]) {
     SPI.beginTransaction(_SPISettings);
     digitalWrite(CSN, LOW);
     for (int i = 0; i < headerLen; i++) {
@@ -56,7 +56,7 @@ void ReadReg(int CSN, byte address, int index, int respLen, byte resp[]) {
     }
 }
 
-void WriteReg(int CSN, byte address, int index, int dataLen, byte data[]) {
+void WriteReg(int CSN, byte address, int index, int dataLen, byte* data) {
     if (!index) {
         _SPITxn(CSN, 1, _header(true, address), dataLen, data, 0, NULL);
     } else if (index < 0x7F) {
@@ -231,6 +231,17 @@ bool isReceiveTimestampAvailable(int CSN) {
     return (buf[1] & 0x04) == 0x04;
 }
 
+uint64_t getTimestamp(int CSN) {
+    byte buf[5];
+    ReadReg(CSN, SYS_TIME, 0, 5, buf);
+    uint64_t timestamp = buf[0]; timestamp <<= 8;
+    timestamp += buf[1]; timestamp <<= 8;
+    timestamp += buf[2]; timestamp <<= 8;
+    timestamp += buf[3]; timestamp <<= 8;
+    timestamp += buf[4];
+    return timestamp;
+}
+
 bool isReceiveDone(int CSN) {
     byte buf[2];
     ReadReg(CSN, SYS_STATUS, 0, 2, buf);
@@ -243,11 +254,18 @@ bool isReceiveError(int CSN) { //Note: Rejection due to frame filtering or timeo
     return (buf[2] & 0x05) | (buf[1] & 0x90);
 }
 
-void GetReceiveTimestamp(int CSN, byte data[]){
-    ReadReg(CSN, RX_TIME, 0, 5, data);
+uint64_t getReceiveTimestamp(int CSN){
+    byte buf[5];
+    ReadReg(CSN, RX_TIME, 0, 5, buf);
+    uint64_t timestamp = buf[0]; timestamp <<= 8;
+    timestamp += buf[1]; timestamp <<= 8;
+    timestamp += buf[2]; timestamp <<= 8;
+    timestamp += buf[3]; timestamp <<= 8;
+    timestamp += buf[4];
+    return timestamp;
 }
 
-void GetReceiveData(int CSN, int dataLen, byte data[]) {
+void GetReceiveData(int CSN, int dataLen, byte* data) {
     ReadReg(CSN, RX_BUFFER, 0, dataLen, data);
 }
 
@@ -281,7 +299,7 @@ void StartAccMemRead(int CSN) {
     delayMicroseconds(5);
 }
 
-void ReadAccMem(int CSN, int index, int dataLen, byte data[]) { //dataLen < 16
+void ReadAccMem(int CSN, int index, int dataLen, byte* data) { //dataLen < 16
     byte tempData[16];
     ReadReg(CSN, 0x25, index, dataLen + 1, tempData);
     for (int i = 0; i < dataLen; i++) {
@@ -298,7 +316,7 @@ void EndAccMemRead(int CSN) {
     delayMicroseconds(5);
 }
 
-void SetTransmitData(int CSN, int dataLen, byte data[]) {
+void SetTransmitData(int CSN, int dataLen, byte* data) {
     WriteReg(CSN, TX_BUFFER, 0, dataLen, data);
     byte buf[1];
     buf[0] = dataLen + 2;
